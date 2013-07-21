@@ -30,7 +30,7 @@ test('test ping', function(assert) {
   }
 })
 
-test('test ping', function(assert) {
+test('test join', function(assert) {
   assert.plan(2)
   var base = setup()
 
@@ -41,5 +41,35 @@ test('test ping', function(assert) {
   function check(who, channel) {
     assert.equal(who, 'WraithBot')
     assert.equal(channel, '#pdxbots')
+  }
+})
+
+test('test privmsg', function(assert) {
+  assert.plan(3)
+  var base = setup()
+
+  base.proto.on('privmsg', check)
+  base.stream.write(':WraithBot!~ircstream@hostname.net PRIVMSG #pdxbots :lol')
+  assert.end()
+
+  function check(who, channel, message) {
+    assert.equal(who, 'WraithBot')
+    assert.equal(channel, '#pdxbots')
+    assert.equal(message, 'lol')
+  }
+})
+
+test('test motd', function(assert) {
+  assert.plan(1)
+  var base = setup()
+
+  base.proto.on('motd', check)
+  base.stream.write(':pratchett.freenode.net 375 WraithBot :- pratchett.freenode.net Message of the Day -')
+  base.stream.write(':pratchett.freenode.net 372 WraithBot :- Please read http://blog.freenode.net/2010/11/be-safe-out-there/')
+  base.stream.write(':pratchett.freenode.net 376 WraithBot :End of /MOTD command.')
+  assert.end()
+  function check(message) {
+    assert.equal(message,
+      '- Please read http://blog.freenode.net/2010/11/be-safe-out-there/')
   }
 })

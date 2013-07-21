@@ -11,12 +11,17 @@ var irc = require('./index')
   }
   , tcp = net.createConnection(serverOptions)
   , client = irc(tcp, ircOptions)
+  , utils = require('./lib/utils')
 
 client.on('join', function(who, channel) {
-  console.log(who+' joined '+channel)
   if (who === 'WraithBot' && channel === '#pdxbots') {
     client.privmsg('#pdxbots', 'This is super neat!')
   }
 })
 
-client.pipe(fs.createWriteStream('irc.log'))
+client.on('privmsg', function(who, channel, message) {
+
+})
+
+client.pipe(utils.newline())
+  .pipe(fs.createWriteStream('irc.log'))

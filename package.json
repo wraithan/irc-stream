@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "through": "~2.3.4",
-    "split": "~0.2.5"
+    "split": "~0.2.5",
+    "debug": "~0.7.2"
   },
   "devDependencies": {
     "tape": "~1.0.4"

@@ -2,6 +2,7 @@ var EventEmitter = require('events').EventEmitter
   , through = require('through')
   , split = require('split')
   , protocol = require('./lib/protocol')
+  , utils = require('./lib/utils')
 
 
 var irc = function(conn, options) {
@@ -16,12 +17,12 @@ var irc = function(conn, options) {
     send.write('JOIN :'+ options.channels[0])
   })
 
-  send.pipe(chunk('send'))
-    .pipe(newline())
+  send.pipe(utils.chunk('send'))
+    .pipe(utils.newline())
     .pipe(conn)
 
   conn.pipe(split())
-    .pipe(chunk('recv'))
+    .pipe(utils.chunk('recv'))
     .pipe(recv)
     .pipe(stream)
 
@@ -29,32 +30,19 @@ var irc = function(conn, options) {
     send.write('PONG :' + who)
   })
 
-  recv.on('event', function(data) {
-    stream.emit.apply(stream, data)
+  recv.on('event', function() {
+    stream.emit.apply(stream, arguments)
   })
 
   stream.privmsg = function privmsg(target, msg) {
-    console.log(['privmsg', target, msg])
     send.write('PRIVMSG ' + target + ' :' + msg)
   }
 
+  stream.raw = function raw(data) {
+    send.write(data)
+  }
+
   return stream
-}
-
-function chunk(name) {
-  return through(function write(data) {
-    this.queue(data)
-//    console.log('(' + name + ')[' + data + ']')
-  })
-}
-
-function newline() {
-  return through(function write(data) {
-    if (data[data.length-1] !== '\n') {
-      data += '\n'
-    }
-    this.queue(data)
-  })
 }
 
 module.exports = irc
