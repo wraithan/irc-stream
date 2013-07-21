@@ -5,7 +5,7 @@ A duplex stream that takes a duplex stream as its input (such as a socket connec
 ## Usage
 
 ```javascript
-var irc = require('irc-stream')
+var irc = require('./index')
   , net = require('net')
   , fs = require('fs')
   , serverOptions = {
@@ -17,17 +17,12 @@ var irc = require('irc-stream')
     , channels: ['#pdxbots']
   }
   , tcp = net.createConnection(serverOptions)
-  , client = new irc(ircOptions)
+  , client = irc(tcp, ircOptions)
 
-client.socket.pipe(tcp).pipe(client.socket)
-
-client.emitter.on('join', function(msg) {
-  if (msg.channel === '#pdxbots') {
-    client.write({
-      type: 'privmsg'
-    , target: '#pdxbots'
-    , message: 'This is super neat!'
-    })
+client.on('join', function(who, channel) {
+  console.log(who+' joined '+channel)
+  if (who === 'WraithBot' && channel === '#pdxbots') {
+    client.privmsg('#pdxbots', 'This is super neat!')
   }
 })
 
