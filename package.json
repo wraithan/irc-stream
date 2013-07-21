@@ -18,5 +18,12 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/wraithan/irc-stream/issues"
+  },
+  "dependencies": {
+    "through": "~2.3.4",
+    "split": "~0.2.5"
+  },
+  "devDependencies": {
+    "tape": "~1.0.4"
   }
 }
