@@ -73,3 +73,18 @@ test('test motd', function(assert) {
       '- Please read http://blog.freenode.net/2010/11/be-safe-out-there/')
   }
 })
+
+test('test names', function(assert) {
+  assert.plan(2)
+  var base = setup()
+
+  base.proto.on('names', check)
+  base.stream.write(':hitchcock.freenode.net 353 WraithBot = #pdxbots :various names that could exist')
+  base.stream.write(':hitchcock.freenode.net 366 WraithBot #pdxbots :End of /NAMES list.')
+  assert.end()
+
+  function check(channel, names) {
+    assert.equal(channel, '#pdxbots')
+    assert.deepEqual(names, ['various', 'names', 'that', 'could', 'exist'])
+  }
+})
